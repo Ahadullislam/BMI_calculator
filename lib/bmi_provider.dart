@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 
 import 'constant.dart';
 
@@ -16,16 +15,17 @@ class BmiProvider extends ChangeNotifier {
   double get bmi => _bmi;
   Color get color => _color;
 
-  BmiProvider(){
+  BmiProvider() {
     _updateBmi();
   }
 
-  changeH(double value){
+  changeH(double value) {
     _heightV = value;
     _updateBmi();
     notifyListeners();
   }
-  changeW(double value){
+
+  changeW(double value) {
     _weightV = value;
     _updateBmi();
     _updateColor();

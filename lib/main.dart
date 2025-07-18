@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       title: 'BMI Calculator',
-      home: BmiHome(),
+      home: const BmiHome(),
     );
   }
 }
