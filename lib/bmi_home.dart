@@ -1,173 +1,320 @@
-import 'dart:core';
-
-import 'package:bmi_calc/bmi_provider.dart';
-import 'package:bmi_calc/constant.dart';
+import 'package:bmi_calc/bmi_result_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class BmiHome extends StatelessWidget {
-  const BmiHome({super.key});
+class BMIHome extends StatefulWidget {
+  const BMIHome({super.key});
+
+  @override
+  _BMIHomeState createState() => _BMIHomeState();
+}
+
+class _BMIHomeState extends State<BMIHome> {
+  final _formKey = GlobalKey<FormState>();
+  double _height = 170;
+  double _weight = 70;
+  int _age = 25;
+  String? _gender;
+  String? _activityLevel;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundcolor,
       appBar: AppBar(
-        title: const Text('BMI Calculator'),
+        title: const Text(
+          'BMI Calculator',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 4.0, right: 4.0, top: 5.0),
-        child: Column(
-          children: [
-            Consumer<BmiProvider>(
-              builder: (context, provider, child) => BmiSlider(
-                label: 'Height',
-                unit: BMIUnit.m,
-                sliderV: provider.heightV,
-                slideDiv: 150,
-                slidermin: 1.1,
-                slidermax: 2.2,
-                onChange: (newValue) {
-                  provider.changeH(newValue);
-                },
-              ),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0f0c29), Color(0xFF302b63), Color(0xFF24243e)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 80.0, 16.0, 16.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                _buildCard(
+                  child: _buildHeightSlider(),
+                ),
+                SizedBox(height: 20),
+                _buildCard(
+                  child: _buildWeightSlider(),
+                ),
+                SizedBox(height: 20),
+                _buildCard(
+                  child: _buildAgeField(),
+                ),
+                SizedBox(height: 20),
+                _buildCard(
+                  child: _buildGenderDropdown(),
+                ),
+                SizedBox(height: 20),
+                _buildCard(
+                  child: _buildActivityLevelDropdown(),
+                ),
+                SizedBox(height: 40),
+                _buildCalculateButton(),
+              ],
             ),
-            Consumer<BmiProvider>(
-              builder: (context, provider, child) => BmiSlider(
-                label: 'Weight',
-                unit: BMIUnit.kg,
-                sliderV: provider.weightV,
-                slideDiv: 200,
-                slidermin: 30,
-                slidermax: 150,
-                onChange: (newValue) {
-                  provider.changeW(newValue);
-                },
-              ),
-            ),
-            Consumer<BmiProvider>(
-              builder: (context, provider, child) => Expanded(
-                child: BmiResult(
-                    color: provider.color,
-                    bmi: provider.bmi,
-                    status: provider.status),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
-}
 
-class BmiSlider extends StatelessWidget {
-  const BmiSlider({
-    super.key,
-    required this.label,
-    required this.unit,
-    required this.sliderV,
-    required this.slideDiv,
-    required this.slidermin,
-    required this.slidermax,
-    required this.onChange,
-  });
+  Widget _buildCard({required Widget child}) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
+      ),
+      child: child,
+    );
+  }
 
-  final String label;
-  final BMIUnit unit;
-  final double sliderV;
-  final int slideDiv;
-  final double slidermax, slidermin;
-  final Function(double) onChange;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildHeightSlider() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text('Height',
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold)),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              label,
-              style: txtlabestyle,
+            Expanded(
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: Colors.purpleAccent,
+                  inactiveTrackColor: Colors.white.withOpacity(0.3),
+                  thumbColor: Colors.amberAccent,
+                  overlayColor: Colors.purpleAccent.withAlpha(0x29),
+                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 14.0),
+                  overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+                ),
+                child: Slider(
+                  value: _height,
+                  min: 100,
+                  max: 250,
+                  label: _height.round().toString(),
+                  onChanged: (double value) {
+                    setState(() {
+                      _height = value;
+                    });
+                  },
+                ),
+              ),
             ),
-            const SizedBox(
-              width: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: RichText(
-                  text: TextSpan(
-                      text: sliderV.toStringAsFixed(1),
-                      style: txtvaluestyle,
-                      children: [
-                    TextSpan(
-                      text: ' ${unit.name}',
-                      style: txtlabestyle.copyWith(fontSize: 20),
-                    )
-                  ])),
-            )
+            Text('${_height.round()} cm',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
-        Slider(
-          activeColor: Colors.white,
-          inactiveColor: Colors.white,
-          label: sliderV.toStringAsFixed(1),
-          value: sliderV,
-          divisions: slideDiv,
-          max: slidermax,
-          min: slidermin,
-          onChanged: (value) {
-            onChange(value);
-          },
-        )
       ],
     );
   }
-}
 
-class BmiResult extends StatelessWidget {
-  final Color color;
-  final double bmi;
-  final String status;
-
-  const BmiResult(
-      {super.key,
-      required this.color,
-      required this.bmi,
-      required this.status});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildWeightSlider() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AnimatedContainer(
-          duration: const Duration(microseconds: 500),
-          alignment: Alignment.center,
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: color, width: 10)),
-          child: Text(
-            bmi.toStringAsFixed(1),
-            style: txtvaluestyle.copyWith(fontSize: 50),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            status,
-            style: const TextStyle(
-              letterSpacing: 1.2,
-              fontSize: 25,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+        Text('Weight',
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold)),
+        Row(
+          children: [
+            Expanded(
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: Colors.purpleAccent,
+                  inactiveTrackColor: Colors.white.withOpacity(0.3),
+                  thumbColor: Colors.amberAccent,
+                  overlayColor: Colors.purpleAccent.withAlpha(0x29),
+                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 14.0),
+                  overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+                ),
+                child: Slider(
+                  value: _weight,
+                  min: 30,
+                  max: 200,
+                  label: _weight.round().toString(),
+                  onChanged: (double value) {
+                    setState(() {
+                      _weight = value;
+                    });
+                  },
+                ),
+              ),
             ),
-          ),
-        )
+            Text('${_weight.round()} kg',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold)),
+          ],
+        ),
       ],
+    );
+  }
+
+  Widget _buildAgeField() {
+    return TextFormField(
+      initialValue: _age.toString(),
+      decoration: _inputDecoration('Age'),
+      style: TextStyle(color: Colors.white, fontSize: 18),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your age';
+        }
+        if (int.tryParse(value) == null || int.parse(value) <= 0) {
+          return 'Please enter a valid age';
+        }
+        return null;
+      },
+      onSaved: (value) {
+        _age = int.parse(value!);
+      },
+    );
+  }
+
+  Widget _buildGenderDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _gender,
+      decoration: _inputDecoration('Gender'),
+      dropdownColor: Color(0xFF302b63),
+      icon: Icon(Icons.arrow_drop_down, color: Colors.purpleAccent),
+      style: TextStyle(color: Colors.white, fontSize: 18),
+      items: ['Male', 'Female']
+          .map((label) => DropdownMenuItem(
+                child: Text(label),
+                value: label,
+              ))
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _gender = value;
+        });
+      },
+      validator: (value) => value == null ? 'Please select a gender' : null,
+    );
+  }
+
+  Widget _buildActivityLevelDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _activityLevel,
+      decoration: _inputDecoration('Activity Level'),
+      dropdownColor: Color(0xFF302b63),
+      isExpanded: true,
+      icon: Icon(Icons.arrow_drop_down, color: Colors.purpleAccent),
+      style: TextStyle(color: Colors.white, fontSize: 18),
+      items: [
+        'Sedentary (little or no exercise)',
+        'Lightly active (light exercise/sports 1-3 days/week)',
+        'Moderately active (moderate exercise/sports 3-5 days/week)',
+        'Very active (hard exercise/sports 6-7 days a week)',
+        'Extra active (very hard exercise/sports & physical job)'
+      ]
+          .map((label) => DropdownMenuItem(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                value: label,
+              ))
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _activityLevel = value;
+        });
+      },
+      validator: (value) =>
+          value == null ? 'Please select an activity level' : null,
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+      floatingLabelBehavior: FloatingLabelBehavior.never,
+      filled: true,
+      fillColor: Colors.black.withOpacity(0.3),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide.none,
+      ),
+      errorStyle: TextStyle(color: Colors.amberAccent),
+    );
+  }
+
+  Widget _buildCalculateButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.purpleAccent,
+        padding: EdgeInsets.symmetric(vertical: 20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        shadowColor: Colors.purpleAccent.withOpacity(0.5),
+        elevation: 10,
+      ),
+      onPressed: () {
+        if (_formKey.currentState!.validate()) {
+          _formKey.currentState!.save();
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  BMIResultScreen(
+                height: _height,
+                weight: _weight,
+                age: _age,
+                gender: _gender!,
+                activityLevel: _activityLevel!,
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var begin = Offset(0.0, 1.0);
+                var end = Offset.zero;
+                var curve = Curves.ease;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+            ),
+          );
+        }
+      },
+      child: Text(
+        'Calculate BMI',
+        style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white),
+      ),
     );
   }
 }
