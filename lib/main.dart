@@ -1,13 +1,9 @@
-import 'package:bmi_calc/bmi_provider.dart';
+import 'package:bmi_calc/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
-import 'package:bmi_calc/bmi_home.dart';
-import 'package:provider/provider.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-      create: (context)=> BmiProvider(),
-      child: const MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -22,7 +18,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       title: 'BMI Calculator',
-      home: const BmiHome(),
+      home: SplashScreen(),
     );
   }
 }
